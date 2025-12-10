@@ -1,13 +1,23 @@
+
 import React, { useState } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { FileSanitization } from './components/FileSanitization';
 import { StreamMonitor } from './components/StreamMonitor';
 import { SystemLogs } from './components/SystemLogs';
 import { ViewState } from './types';
+import { LogService } from './services/logService';
 import { Bell, User, CheckCircle, Code } from 'lucide-react';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>('FILES');
+  
+  // Settings State
+  const [rotationPolicy, setRotationPolicy] = useState('4');
+  const [resizePolicy, setResizePolicy] = useState('95');
+
+  const handleSettingChange = (setting: string, value: string) => {
+    LogService.addLog('SYSTEM', 'INFO', `Global configuration updated: ${setting} changed to ${value}`);
+  };
 
   const renderContent = () => {
     switch (currentView) {
@@ -46,11 +56,33 @@ const App: React.FC = () => {
                   <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-2">
                     <label className="flex items-center justify-between">
                        <span className="text-slate-600">Rotation Iterations</span>
-                       <select className="border border-slate-300 rounded px-2 py-1"><option>4 (360°)</option></select>
+                       <select 
+                         className="border border-slate-300 rounded px-2 py-1 bg-white"
+                         value={rotationPolicy}
+                         onChange={(e) => {
+                           setRotationPolicy(e.target.value);
+                           handleSettingChange('ImageRotation', e.target.value);
+                         }}
+                       >
+                         <option value="1">1 (90°)</option>
+                         <option value="2">2 (180°)</option>
+                         <option value="4">4 (360° - Full Sanitization)</option>
+                       </select>
                     </label>
                     <label className="flex items-center justify-between">
                        <span className="text-slate-600">Resize Target</span>
-                       <select className="border border-slate-300 rounded px-2 py-1"><option>95%</option></select>
+                       <select 
+                         className="border border-slate-300 rounded px-2 py-1 bg-white"
+                         value={resizePolicy}
+                         onChange={(e) => {
+                           setResizePolicy(e.target.value);
+                           handleSettingChange('ImageResize', e.target.value);
+                         }}
+                       >
+                         <option value="100">100% (No resize)</option>
+                         <option value="95">95% (Strip Metadata)</option>
+                         <option value="90">90%</option>
+                       </select>
                     </label>
                   </div>
                 </div>
@@ -60,6 +92,10 @@ const App: React.FC = () => {
                     <label className="flex items-center justify-between">
                        <span className="text-slate-600">Target Format</span>
                        <span className="text-slate-800 font-mono text-sm">PDF (Flattened)</span>
+                    </label>
+                    <label className="flex items-center justify-between">
+                       <span className="text-slate-600">Macro Removal</span>
+                       <span className="text-green-600 font-bold text-sm">FORCED</span>
                     </label>
                   </div>
                 </div>
@@ -81,7 +117,7 @@ const App: React.FC = () => {
              <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
              <span>System Status: <strong className="text-green-600">Operational</strong></span>
              <span className="mx-3">|</span>
-             <span>Queue Depth: 0</span>
+             <span>Backend: C++ Service (PID 4920)</span>
           </div>
 
           <div className="flex items-center space-x-6">

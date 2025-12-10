@@ -1,6 +1,8 @@
+
 import React, { useState } from 'react';
 import { Video, Radio, Activity, Settings, Plus, PlayCircle, StopCircle, Trash2 } from 'lucide-react';
 import { StreamConfig } from '../types';
+import { LogService } from '../services/logService';
 
 export const StreamMonitor: React.FC = () => {
   const [streams, setStreams] = useState<StreamConfig[]>([
@@ -39,19 +41,27 @@ export const StreamMonitor: React.FC = () => {
   const toggleStatus = (id: string) => {
     setStreams(prev => prev.map(s => {
       if (s.id === id) {
-        return { ...s, status: s.status === 'ACTIVE' ? 'STOPPED' : 'ACTIVE' };
+        const newStatus = s.status === 'ACTIVE' ? 'STOPPED' : 'ACTIVE';
+        LogService.addLog('STREAM', newStatus === 'ACTIVE' ? 'INFO' : 'WARN', `Stream [${s.name}] state changed to ${newStatus}`);
+        return { ...s, status: newStatus };
       }
       return s;
     }));
   };
 
   const deleteStream = (id: string) => {
+    const stream = streams.find(s => s.id === id);
+    if (stream) {
+        LogService.addLog('STREAM', 'WARN', `Stream configuration deleted: ${stream.name}`);
+    }
     setStreams(prev => prev.filter(s => s.id !== id));
   };
 
   const handleAddStream = () => {
     if (!newStream.name || !newStream.sourceUrl || !newStream.targetPort) return;
     
+    LogService.addLog('SYSTEM', 'INFO', `New secure stream configuration created: ${newStream.name} (${newStream.protocol})`);
+
     setStreams(prev => [...prev, {
       id: Math.random().toString(36).substr(2, 9),
       name: newStream.name!,

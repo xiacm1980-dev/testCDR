@@ -1,3 +1,4 @@
+
 export enum FileType {
   DOCUMENT = 'DOCUMENT',
   IMAGE = 'IMAGE',
@@ -26,6 +27,10 @@ export interface SanitizationTask {
   threatAnalysis?: string; // Result from Gemini
   sanitizationDetails?: string[]; // Steps taken (e.g., "Macros Removed", "Rotated 4x")
   timestamp: number;
+  resultFilename?: string;
+  downloadUrl?: string;
+  base64Data?: string; // Store small file content for reconstruction/preview
+  mimeType?: string;
 }
 
 export interface StreamConfig {
