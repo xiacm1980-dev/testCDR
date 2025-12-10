@@ -1,12 +1,18 @@
 
 import React, { useState, useEffect } from 'react';
 import { Database, Search, Filter, Download, Trash } from 'lucide-react';
-import { LogEntry } from '../types';
+import { LogEntry, Language } from '../types';
 import { LogService } from '../services/logService';
+import { translations } from '../services/translations';
 
-export const SystemLogs: React.FC = () => {
+interface SystemLogsProps {
+  lang: Language;
+}
+
+export const SystemLogs: React.FC<SystemLogsProps> = ({ lang }) => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const t = translations[lang];
 
   const refreshLogs = () => {
     setLogs(LogService.getLogs());
@@ -45,14 +51,14 @@ export const SystemLogs: React.FC = () => {
       <div className="p-6 border-b border-slate-200 flex items-center justify-between">
         <div className="flex items-center">
           <Database className="w-5 h-5 text-indigo-600 mr-2" />
-          <h2 className="text-lg font-bold text-slate-800">System Logs (Persistent SQLite)</h2>
+          <h2 className="text-lg font-bold text-slate-800">{t.logsTitle}</h2>
         </div>
         <div className="flex space-x-2">
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
             <input 
               type="text" 
-              placeholder="Search audit trail..." 
+              placeholder={t.searchLogs} 
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className="pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none w-64"
@@ -75,10 +81,10 @@ export const SystemLogs: React.FC = () => {
         <table className="w-full text-left text-sm">
           <thead className="bg-slate-50 sticky top-0 z-10 text-slate-500 font-medium">
             <tr>
-              <th className="px-6 py-3 border-b border-slate-200">Timestamp</th>
-              <th className="px-6 py-3 border-b border-slate-200">Level</th>
-              <th className="px-6 py-3 border-b border-slate-200">Module</th>
-              <th className="px-6 py-3 border-b border-slate-200 w-full">Message</th>
+              <th className="px-6 py-3 border-b border-slate-200">{t.timestamp}</th>
+              <th className="px-6 py-3 border-b border-slate-200">{t.level}</th>
+              <th className="px-6 py-3 border-b border-slate-200">{t.module}</th>
+              <th className="px-6 py-3 border-b border-slate-200 w-full">{t.message}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -101,7 +107,7 @@ export const SystemLogs: React.FC = () => {
             )) : (
               <tr>
                 <td colSpan={4} className="px-6 py-12 text-center text-slate-400">
-                  {logs.length === 0 ? "No logs found in persistent storage." : "No logs match your search."}
+                  {logs.length === 0 ? t.noLogs : t.noLogsMatch}
                 </td>
               </tr>
             )}

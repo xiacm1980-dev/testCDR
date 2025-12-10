@@ -1,10 +1,11 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Upload, FileText, Image as ImageIcon, Video, Music, ShieldCheck, RefreshCw, AlertTriangle, CheckCircle, File as FileIcon, Download, History, Trash2 } from 'lucide-react';
-import { SanitizationTask, ProcessingStatus, FileType } from '../types';
+import { SanitizationTask, ProcessingStatus, FileType, Language } from '../types';
 import { analyzeFileContent } from '../services/geminiService';
 import { LogService } from '../services/logService';
 import { FileService } from '../services/fileService';
+import { translations } from '../services/translations';
 
 const MOCK_PROCESSING_STEPS: Record<FileType, string[]> = {
   [FileType.DOCUMENT]: ['Parsing Structure', 'Stripping Macros', 'Flattening OLE Objects', 'Rebuilding as PDF'],
@@ -14,9 +15,14 @@ const MOCK_PROCESSING_STEPS: Record<FileType, string[]> = {
   [FileType.UNKNOWN]: ['Binary Analysis', 'Sanitization Failed']
 };
 
-export const FileSanitization: React.FC = () => {
+interface FileSanitizationProps {
+  lang: Language;
+}
+
+export const FileSanitization: React.FC<FileSanitizationProps> = ({ lang }) => {
   const [tasks, setTasks] = useState<SanitizationTask[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const t = translations[lang];
 
   // Load history on mount
   useEffect(() => {
@@ -219,7 +225,7 @@ export const FileSanitization: React.FC = () => {
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center">
           <ShieldCheck className="w-6 h-6 mr-2 text-indigo-600" />
-          Deep Content Disarm & Reconstruction
+          {t.cdrTitle}
         </h2>
         
         <div 
@@ -229,10 +235,10 @@ export const FileSanitization: React.FC = () => {
           <div className="p-4 bg-indigo-50 rounded-full mb-4 group-hover:scale-110 transition-transform">
             <Upload className="w-8 h-8 text-indigo-600" />
           </div>
-          <p className="text-lg font-medium text-slate-700">Drop files here or click to upload</p>
+          <p className="text-lg font-medium text-slate-700">{t.uploadPrompt}</p>
           <p className="text-sm text-slate-500 mt-2 text-center max-w-md">
-            Supports DOCX, PDF, JPG, PNG, MP4. <br/>
-            <span className="text-xs text-slate-400">All files are reconstructed. Documents are converted to Safe PDF.</span>
+            {t.uploadDesc} <br/>
+            <span className="text-xs text-slate-400">{t.uploadSub}</span>
           </p>
           <input 
             type="file" 
@@ -247,14 +253,14 @@ export const FileSanitization: React.FC = () => {
       <div className="flex items-center justify-between pt-4 pb-2">
         <h3 className="text-lg font-semibold text-slate-700 flex items-center">
           <History className="w-5 h-5 mr-2" />
-          Processing History (Persistent)
+          {t.processingHistory}
         </h3>
         {tasks.length > 0 && (
           <button 
             onClick={handleClearHistory}
             className="text-sm text-red-500 hover:text-red-700 flex items-center"
           >
-            <Trash2 className="w-4 h-4 mr-1" /> Clear History
+            <Trash2 className="w-4 h-4 mr-1" /> {t.clearHistory}
           </button>
         )}
       </div>
@@ -277,7 +283,7 @@ export const FileSanitization: React.FC = () => {
                       task.status === ProcessingStatus.FAILED ? 'text-red-600' :
                       'text-indigo-600'
                     }`}>
-                      {task.status}
+                      {t.status[task.status] || task.status}
                     </span>
                   </div>
                 </div>
@@ -293,7 +299,7 @@ export const FileSanitization: React.FC = () => {
                     className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-sm text-sm font-medium"
                   >
                     <Download className="w-4 h-4" />
-                    <span>Download {task.type === FileType.DOCUMENT ? 'Safe PDF' : 'Cleaned File'}</span>
+                    <span>{task.type === FileType.DOCUMENT ? t.downloadSafe : t.downloadClean}</span>
                   </button>
                 ) : (
                   <>
@@ -323,7 +329,7 @@ export const FileSanitization: React.FC = () => {
                 {/* Steps Log */}
                 <div>
                   <h4 className="font-semibold text-slate-700 mb-2 flex items-center">
-                    <RefreshCw className="w-4 h-4 mr-2" /> Pipeline Steps
+                    <RefreshCw className="w-4 h-4 mr-2" /> {t.pipelineSteps}
                   </h4>
                   <ul className="space-y-1">
                     {task.sanitizationDetails?.map((step, idx) => (
@@ -339,10 +345,10 @@ export const FileSanitization: React.FC = () => {
                 <div>
                   <h4 className="font-semibold text-slate-700 mb-2 flex items-center">
                     <AlertTriangle className="w-4 h-4 mr-2 text-amber-500" /> 
-                    Threat Surface Analysis
+                    {t.threatAnalysis}
                   </h4>
                   <div className="bg-white p-3 rounded border border-slate-200 h-24 overflow-y-auto text-slate-600 italic">
-                    {task.threatAnalysis ? task.threatAnalysis : "Waiting for analysis..."}
+                    {task.threatAnalysis ? task.threatAnalysis : t.waitingAnalysis}
                   </div>
                 </div>
 
@@ -353,7 +359,7 @@ export const FileSanitization: React.FC = () => {
 
         {tasks.length === 0 && (
           <div className="text-center py-12 text-slate-400">
-            No history found. Upload a file to begin.
+            {t.noHistory}
           </div>
         )}
       </div>

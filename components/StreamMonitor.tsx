@@ -1,10 +1,15 @@
 
 import React, { useState } from 'react';
 import { Video, Radio, Activity, Settings, Plus, PlayCircle, StopCircle, Trash2 } from 'lucide-react';
-import { StreamConfig } from '../types';
+import { StreamConfig, Language } from '../types';
 import { LogService } from '../services/logService';
+import { translations } from '../services/translations';
 
-export const StreamMonitor: React.FC = () => {
+interface StreamMonitorProps {
+  lang: Language;
+}
+
+export const StreamMonitor: React.FC<StreamMonitorProps> = ({ lang }) => {
   const [streams, setStreams] = useState<StreamConfig[]>([
     {
       id: '1',
@@ -29,6 +34,8 @@ export const StreamMonitor: React.FC = () => {
       fpsCompression: true
     }
   ]);
+  
+  const t = translations[lang];
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newStream, setNewStream] = useState<Partial<StreamConfig>>({
@@ -81,14 +88,14 @@ export const StreamMonitor: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">Video Stream Proxies</h2>
-          <p className="text-slate-500">Real-time H264 decode, noise injection, and re-encode pipeline.</p>
+          <h2 className="text-2xl font-bold text-slate-800">{t.streamTitle}</h2>
+          <p className="text-slate-500">{t.streamDesc}</p>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
           className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center shadow-sm transition-colors"
         >
-          <Plus className="w-4 h-4 mr-2" /> Add Stream
+          <Plus className="w-4 h-4 mr-2" /> {t.addStream}
         </button>
       </div>
 
@@ -129,18 +136,18 @@ export const StreamMonitor: React.FC = () => {
 
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between py-2 border-b border-slate-50">
-                  <span className="text-slate-500">Source</span>
+                  <span className="text-slate-500">{t.source}</span>
                   <span className="font-mono text-slate-700 truncate max-w-[200px]" title={stream.sourceUrl}>{stream.sourceUrl}</span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-slate-50">
-                  <span className="text-slate-500">Target Port</span>
+                  <span className="text-slate-500">{t.targetPort}</span>
                   <span className="font-mono text-slate-700">{stream.targetPort}</span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-slate-50">
-                  <span className="text-slate-500">Pipeline Config</span>
+                  <span className="text-slate-500">{t.pipelineConfig}</span>
                   <div className="flex items-center space-x-2">
                     <span className="bg-indigo-50 text-indigo-700 px-2 rounded text-xs">Dec: H264(YUV)</span>
-                    <span className="bg-amber-50 text-amber-700 px-2 rounded text-xs">Noise: {stream.noiseLevel}</span>
+                    <span className="bg-amber-50 text-amber-700 px-2 rounded text-xs">{t.noise}: {stream.noiseLevel}</span>
                   </div>
                 </div>
               </div>
@@ -148,7 +155,7 @@ export const StreamMonitor: React.FC = () => {
               {stream.status === 'ACTIVE' && (
                 <div className="mt-6">
                   <div className="flex items-center justify-between text-xs text-slate-500 mb-2">
-                    <span className="flex items-center"><Activity className="w-3 h-3 mr-1" /> Bandwidth</span>
+                    <span className="flex items-center"><Activity className="w-3 h-3 mr-1" /> {t.bandwidth}</span>
                     <span>2.4 Mbps</span>
                   </div>
                   {/* Fake visualization graph */}
@@ -172,10 +179,10 @@ export const StreamMonitor: React.FC = () => {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-bold text-slate-800 mb-4">Configure New Secure Stream</h3>
+            <h3 className="text-lg font-bold text-slate-800 mb-4">{t.configureStream}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Stream Name</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">{t.streamName}</label>
                 <input 
                   type="text" 
                   className="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -186,7 +193,7 @@ export const StreamMonitor: React.FC = () => {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                   <label className="block text-sm font-medium text-slate-700 mb-1">Protocol</label>
+                   <label className="block text-sm font-medium text-slate-700 mb-1">{t.protocol}</label>
                    <select 
                     className="w-full border border-slate-300 rounded-lg p-2"
                     value={newStream.protocol}
@@ -197,7 +204,7 @@ export const StreamMonitor: React.FC = () => {
                    </select>
                 </div>
                 <div>
-                   <label className="block text-sm font-medium text-slate-700 mb-1">Output Port</label>
+                   <label className="block text-sm font-medium text-slate-700 mb-1">{t.targetPort}</label>
                    <input 
                     type="number" 
                     className="w-full border border-slate-300 rounded-lg p-2"
@@ -208,7 +215,7 @@ export const StreamMonitor: React.FC = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Source URL</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">{t.sourceUrl}</label>
                 <input 
                   type="text" 
                   className="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -219,7 +226,7 @@ export const StreamMonitor: React.FC = () => {
               </div>
               
               <div className="border-t border-slate-200 pt-4 mt-2">
-                <label className="block text-sm font-medium text-slate-700 mb-2">CDR Parameters</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">{t.cdrParams}</label>
                 <div className="flex items-center space-x-4 text-sm">
                   <label className="flex items-center">
                     <input 
@@ -228,10 +235,10 @@ export const StreamMonitor: React.FC = () => {
                       onChange={e => setNewStream({...newStream, fpsCompression: e.target.checked})}
                       className="mr-2"
                     />
-                    Compress FPS
+                    {t.compressFps}
                   </label>
                   <label className="flex items-center">
-                    <span className="mr-2 text-slate-600">Noise:</span>
+                    <span className="mr-2 text-slate-600">{t.noise}:</span>
                     <select 
                       value={newStream.noiseLevel}
                       onChange={e => setNewStream({...newStream, noiseLevel: e.target.value as any})}
@@ -250,13 +257,13 @@ export const StreamMonitor: React.FC = () => {
                   onClick={() => setIsModalOpen(false)}
                   className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg"
                 >
-                  Cancel
+                  {t.cancel}
                 </button>
                 <button 
                   onClick={handleAddStream}
                   className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
                 >
-                  Create Stream
+                  {t.create}
                 </button>
               </div>
             </div>

@@ -1,13 +1,18 @@
+
 import React from 'react';
 import { Shield, FileText, Video, Server, Settings, Terminal } from 'lucide-react';
-import { ViewState } from '../types';
+import { ViewState, Language } from '../types';
+import { translations } from '../services/translations';
 
 interface SidebarProps {
   currentView: ViewState;
   setView: (view: ViewState) => void;
+  lang: Language;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ currentView, setView }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, lang }) => {
+  const t = translations[lang];
+
   const NavItem = ({ view, icon, label }: { view: ViewState; icon: React.ReactNode; label: string }) => (
     <button
       onClick={() => setView(view)}
@@ -37,27 +42,27 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setView }) => {
       </div>
 
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-        <div className="text-xs font-bold text-slate-500 uppercase px-4 py-2 mt-2">Core Services</div>
-        <NavItem view="FILES" icon={<FileText className="w-5 h-5" />} label="File Sanitization" />
-        <NavItem view="STREAMS" icon={<Video className="w-5 h-5" />} label="Stream Proxies" />
+        <div className="text-xs font-bold text-slate-500 uppercase px-4 py-2 mt-2">{t.coreServices}</div>
+        <NavItem view="FILES" icon={<FileText className="w-5 h-5" />} label={t.fileSanitization} />
+        <NavItem view="STREAMS" icon={<Video className="w-5 h-5" />} label={t.streamProxies} />
         
-        <div className="text-xs font-bold text-slate-500 uppercase px-4 py-2 mt-6">System</div>
-        <NavItem view="LOGS" icon={<Server className="w-5 h-5" />} label="System Logs" />
-        <NavItem view="SETTINGS" icon={<Settings className="w-5 h-5" />} label="Configuration" />
-        <NavItem view="DASHBOARD" icon={<Terminal className="w-5 h-5" />} label="API Status" />
+        <div className="text-xs font-bold text-slate-500 uppercase px-4 py-2 mt-6">{t.system}</div>
+        <NavItem view="LOGS" icon={<Server className="w-5 h-5" />} label={t.systemLogs} />
+        <NavItem view="SETTINGS" icon={<Settings className="w-5 h-5" />} label={t.configuration} />
+        <NavItem view="DASHBOARD" icon={<Terminal className="w-5 h-5" />} label={t.apiStatus} />
       </nav>
 
       <div className="p-4 border-t border-slate-800">
         <div className="bg-slate-800 rounded-lg p-3">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-slate-400">System Load</span>
+            <span className="text-xs text-slate-400">{t.systemLoad}</span>
             <span className="text-xs text-green-400">Normal</span>
           </div>
           <div className="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
             <div className="bg-green-500 h-full w-[24%]"></div>
           </div>
           <div className="flex items-center justify-between mt-3 mb-1">
-            <span className="text-xs text-slate-400">Memory</span>
+            <span className="text-xs text-slate-400">{t.memory}</span>
             <span className="text-xs text-indigo-400">1.2GB / 8GB</span>
           </div>
           <div className="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
