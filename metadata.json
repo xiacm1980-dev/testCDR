@@ -1,0 +1,8 @@
+{
+  "name": "Aegis CDR System",
+  "description": "A frontend control plane for a C++ Content Disarm and Reconstruction system. Manages file sanitization, video stream processing, and system auditing.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
